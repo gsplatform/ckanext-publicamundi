@@ -1,3 +1,5 @@
+// Fixme Rewrite as a CKAN javascript module
+
 (function ($) {
     $(document).ready(function () {
         $("#ingest_button").on("click", function () {
