@@ -8,14 +8,11 @@ import fileinput
 import os
 import shutil
 import logging
-from resources import WCSResource, WMSResource
 import errno
 
-
-import wcst
-
-from gdal_to_gml import GDALToGmlConverter
-
+from ckanext.publicamundi.storers.raster.resources import WCSResource, WMSResource
+from ckanext.publicamundi.storers.raster import wcst
+from ckanext.publicamundi.storers.raster.gdal_to_gml import GDALToGmlConverter
 
 log = logging.getLogger(__name__)
 

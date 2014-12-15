@@ -2,11 +2,13 @@ import logging
 
 import ckan.plugins as plugins
 import ckan.model as model
-import resource_actions
-import pylons.config as global_config
+
+import ckanext.publicamundi.storers.raster as rasterstorer
+from ckanext.publicamundi.storers.raster import resource_actions
+from ckanext.publicamundi.storers.raster.lib.template_helpers import (
+    get_wcs_output_formats, get_wcs_coverage_url)
 
 log = logging.getLogger(__name__)
-
 
 class RasterStorer(plugins.SingletonPlugin):
     """
@@ -14,13 +16,15 @@ class RasterStorer(plugins.SingletonPlugin):
     This class implements the notify method that determines if a dataset was modified and takes appropiate action
     by either registering the raster data or removing it through WCST
     """
+    
     plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IConfigurer, inherit=True)
     plugins.implements(plugins.IConfigurable, inherit=True)
+    plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IDomainObjectModification, inherit=True)
     plugins.implements(plugins.IResourceUrlChange)
-
-    SUPPORTED_FROMATS = "geotiff png jpeg"
+    
+    # IRoutes 
 
     def before_map(self, map):
         """
@@ -36,16 +40,45 @@ class RasterStorer(plugins.SingletonPlugin):
                     controller='ckanext.publicamundi.storers.raster.controllers.import:RasterImportController', action='finalize',
                     resource_id='{resource_id}')
         return map
+   
+    # ITemplateHelpers interface
 
+    def get_helpers(self):
+        return {
+            'rasterstorer_wcs_output_formats': get_wcs_output_formats,
+            'rasterstorer_wcs_coverage_url': get_wcs_coverage_url,
+        }
+
+    # IConfigurable
+    
+    def configure(self, config):
+        
+        # Setup raster module
+        
+        gdal_folder = config.get(
+            'ckanext.publicamundi.rasterstorer.gdal_folder')
+
+        temp_folder = config.get(
+            'ckanext.publicamundi.rasterstorer.temp_dir')
+        
+        rasterstorer.setup(gdal_folder, temp_folder)
+
+        return
+
+    # IConfigurer
+    
     def update_config(self, config):
         """
         Exposes the public folder of this extension. The intermediary gml files will be stored here.
         """
-        plugins.toolkit.add_public_directory(config, global_config.get("ckanext.publicamundi.rasterstorer.temp_dir", ""))
+        temp_dir = config.get('ckanext.publicamundi.rasterstorer.temp_dir')
+        plugins.toolkit.add_public_directory(config, temp_dir)
         plugins.toolkit.add_public_directory(config, 'public')
         plugins.toolkit.add_template_directory(config, 'templates')
         plugins.toolkit.add_resource('public', 'ckanext-publicamundi-raster')
 
+    # IDomainObjectModification, IResourceUrlChange
+    
     def notify(self, entity, operation=None):
         """
         Notifies the plugin when a change is done to a resource
@@ -54,7 +87,7 @@ class RasterStorer(plugins.SingletonPlugin):
         """
         if isinstance(entity, model.resource.Resource):
             if entity.format != "":
-                if entity.format.lower() in self.SUPPORTED_FROMATS:
+                if entity.format.lower() in rasterstorer.supported_formats:
                     if operation == model.domain_object.DomainObjectOperation.new:
                         # A new raster resource has been created
                         resource_actions.create_identify_resource_task(entity)
@@ -70,5 +103,5 @@ class RasterStorer(plugins.SingletonPlugin):
                 operation, entity.id, entity.state))
             if entity.state == 'deleted':
                 for resource in entity.as_dict()['resources']:
-                    if resource['format'] in self.SUPPORTED_FROMATS:
+                    if resource['format'] in rasterstorer.supported_formats:
                         resource_actions.create_delete_resource_task(resource)

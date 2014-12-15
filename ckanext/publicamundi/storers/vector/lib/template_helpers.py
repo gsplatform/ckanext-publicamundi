@@ -7,15 +7,18 @@ import ckanext.publicamundi.storers.vector as vectorstorer
 def get_wfs_output_formats(backend='geoserver'):
     return vectorstorer.wfs_output_formats.get(backend, {})
 
-def url_for_wfs_feature_layer(service_endpoint, layer_name, output_format):
-    '''Build a WFS GetFeature request'''
-    qs_params = OrderedDict([
+def get_wfs_feature_url(service_endpoint, layer_name, output_format):
+    '''Build a WFS GetFeature request
+    '''
+    
+    qs_params = OrderedDict((
         ('service', 'WFS'),
         ('version', '1.0.0'),
         ('request', 'GetFeature'),
         ('typeName', str(layer_name)),
         ('outputFormat', str(output_format)),
-    ])
+    ))
+    
     return service_endpoint + '?' + urllib.urlencode(qs_params)
 
 def get_table_resource(pkg_dict, res_dict):

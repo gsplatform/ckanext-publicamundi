@@ -15,7 +15,8 @@ supported_formats = [
     'geojson',
     'sqlite',
     'geopackage',
-    'gpkg']
+    'gpkg'
+]
 
 wfs_output_formats = {
     'geoserver': [

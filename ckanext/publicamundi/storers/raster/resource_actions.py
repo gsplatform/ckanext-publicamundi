@@ -51,7 +51,7 @@ def _make_default_context():
         'wms_base_url': config.get("ckanext.publicamundi.rasterstorer.wms_base_url", ""),
         'wcst_base_url': config.get("ckanext.publicamundi.rasterstorer.wcst_base_url", ""),
         'gdal_folder': config.get("ckanext.publicamundi.rasterstorer.gdal_folder", "")
-        }
+    }
 
 
 def create_identify_resource_task(resource):

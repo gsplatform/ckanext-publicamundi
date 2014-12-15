@@ -1,10 +1,28 @@
 import sys
 
 __all__ = [ 
+    'supported_formats',
     'gdal',
     'ogr',
     'osr',
 ]
+
+supported_formats = [
+    'geotiff',
+    'png',
+    'jpeg',
+]
+
+wcs_output_formats = {
+    'rasdaman': [
+        { 'display_name': 'CSV', 'name': 'csv' },
+        { 'display_name': 'JPEG', 'name': 'jpeg' },
+        { 'display_name': 'JPEG 2000', 'name': 'jpeg2000' },
+        { 'display_name': 'NetCDF', 'name': 'netcdf' },
+        { 'display_name': 'PNG', 'name': 'png' },
+        { 'display_name': 'TIFF', 'name': 'tiff' },
+    ],
+}
 
 temp_dir = None
 
@@ -18,7 +36,7 @@ def setup(gdal_folder, temp_folder):
     '''The module needs to be explicitly setup (before being used) when certain 
     config parameters are available.
 
-    Note that this module is imported from both `publicamundi_vector` plugin and 
+    Note that this module is imported from both `publicamundi_raster` plugin and 
     from our Celery tasks (which acquire their configuration in very different ways).
     '''
     

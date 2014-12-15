@@ -7,29 +7,15 @@
             >{#<i class="icon-download"></i> #}{{ _('Download as') }} <span class="caret"></span></a>
     <ul class="dropdown-menu">
         {% if res.format == 'wcs' %}
+        {% for fmt in h.rasterstorer_wcs_output_formats() %}
         <li>
-            <a data-resource-id="{{res.wcs_coverage}}" data-resource-format="csv" class="raster-export-button" href="#" target="_blank">CSV</a>
+            <a href="{{ h.rasterstorer_wcs_coverage_url(res.wcs_server, res.wcs_coverage, fmt.name) }}" 
+                target="_blank" >{{ fmt.display_name|safe }}</a>
         </li>
-        <li>
-            <a data-resource-id="{{res.wcs_coverage}}" data-resource-format="jpeg" class="raster-export-button" href="#" target="_blank">JPEG</a>
-        </li>
-        <li>
-            <a data-resource-id="{{res.wcs_coverage}}" data-resource-format="jpeg2000" class="raster-export-button" href="#" target="_blank">JPEG2000</a>
-        </li>
-        <li>
-            <a data-resource-id="{{res.wcs_coverage}}" data-resource-format="netcdf" class="raster-export-button" href="#" target="_blank">NetCDF</a>
-        </li>
-        <li>
-            <a data-resource-id="{{res.wcs_coverage}}" data-resource-format="png" class="raster-export-button" href="#" target="_blank">PNG</a>
-        </li>
-        <li>
-            <a data-resource-id="{{res.wcs_coverage}}" data-resource-format="tiff" class="raster-export-button" href="#" target="_blank">TIFF</a>
-        </li>
-
+        {% endfor %}
         {% endif %} {# res.format #}
     </ul>
 </div>
-{% resource 'ckanext-publicamundi-raster/raster_export' %}
 {% endif %}
 {{ super() }}
 {% endblock %}

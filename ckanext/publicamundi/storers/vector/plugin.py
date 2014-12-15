@@ -10,7 +10,7 @@ from ckanext.publicamundi.storers.vector import resource_actions
 from ckanext.publicamundi.storers.vector.resources import (
     DBTableResource, WMSResource) 
 from ckanext.publicamundi.storers.vector.lib.template_helpers import (
-    get_wfs_output_formats, url_for_wfs_feature_layer, get_table_resource)
+    get_wfs_output_formats, get_wfs_feature_url, get_table_resource)
 
 log = logging.getLogger(__name__)
 
@@ -116,7 +116,7 @@ class VectorStorer(p.SingletonPlugin):
     def get_helpers(self):
         return {
             'vectorstorer_wfs_output_formats': get_wfs_output_formats,
-            'vectorstorer_wfs_feature_url': url_for_wfs_feature_layer,
+            'vectorstorer_wfs_feature_url': get_wfs_feature_url,
             'vectorstorer_table_resource': get_table_resource,
         }
 
